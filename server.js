@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var Client = require('ftp');
+var fileManager = require('./fileManager.js');
 
 mongoose.connect('mongodb://localhost/market');
 
@@ -10,41 +11,12 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
   // yay!
     console.log('Succesfully connected to Mongo!');
-    //download a file
-    var c = new Client();
-    var fileData = ""
-    c.on('ready', function() {
-        console.log('Connected to FTP!');
-
-        c.get('Markets/DA/LMP_By_SETTLEMENT_LOC/2015/03/DA-LMP-SL-201503010100.csv', function(err, stream) {
-            //ftp://pubftp.spp.org/Markets/DA/LMP_By_SETTLEMENT_LOC/2015/03/DA-LMP-SL-201503010100.csv
-            if (err) throw err;
-            stream.once('close', function() { c.end(); });
-            
-            var fileContents = ''
-            stream.on('data',function(buffer){
-                fileContents += buffer;
-//                console.log('on readable data ' + buffer);
-            }); 
-            
-            stream.on('end',function(){
-                console.log('final output lines! ' + fileContents.split("\n").length );
-                console.log('final output! ' + fileContents.length );
-            });
-            
-        });
-    });
-    c.connect({host: 'pubftp.spp.org'});
 });
+
 
 //Mongo models
 var marketSchema = mongoose.Schema({
-    market : String, 
-    type : String, 
-    year : Number, 
-    month : Number, 
-    date : String, 
-    records: Number
+    filePath: String
 });
 
 var Market = mongoose.model('Market', marketSchema);
@@ -63,21 +35,6 @@ var measureSchema = mongoose.Schema({
 
 var Measure = mongoose.model('Measure', measureSchema);
 
-/*
-var mk = new Market({
-    market : 'MMMM', 
-    type : 'MMMMMM', 
-    year : 2015, 
-    month : 1, 
-    date : '02/01/2015', 
-    records: 1
-})
-
-mk.save(function (err, fluffy) {
-  if (err) return console.error(err);
-});
-*/
-
 app.use(express.static(__dirname + "/public"));
 
 app.get('/dayslist', function(req, res){
@@ -88,6 +45,21 @@ app.get('/dayslist', function(req, res){
         res.json(daysList);
     });   
 });
+
+app.get('/ftplist', function(req, res){
+    console.log('Received ftp list request ' + req);
+    fileManager.listFiles(req.currentDirectory, res).then(function(param){
+        console.log('After listing ' + param);
+    });   
+});
+
+app.post('/importfile', function(req, res){
+    console.log('Received importfile request ' + req);
+    fileManager.importFile(req.filePath).then(function(param){
+        console.log('After listing ' + param);
+    });   
+});
+
 
 app.listen(3000);
 
