@@ -1,23 +1,25 @@
-function getMarket(filePath){
+var Client = require('ftp');
+
+function getMarket(filePath, callback){
     Market.findOne({filePath: filePath}, function (err, marketDoc) {
         if (err) return console.error(err);
         console.log('Retrieved -> ' + marketDoc)
         if(marketDoc){
             console.log('Found market row ' + marketDoc);
-            return(marketDoc);
+            callback(marketDoc);
         } 
         else{
             console.log('NOT Found market row');
             var mk = new Market({ filePath : filePath });
             mk.save(function (err, mkt) {
                 if (err) return console.error(err);
-                return(mkt);
+                callback(mkt);
             });
         }
     });   
 }
 
-exports.importFile = function(filePath) {
+exports.importFile = function(filePath, callback) {
     //connect to ftp server
     var c = new Client();
     //download a file
@@ -41,7 +43,7 @@ exports.importFile = function(filePath) {
                 console.log('final output lines! ' + fileContents.split("\n").length );
                 console.log('final output! ' + fileContents.length );
                 var lines = fileContents.split("\n")
-                getMarket(filePath).then(function(marketDoc){
+                getMarket(filePath, function(marketDoc){
                     console.log("Got market doc " + marketDoc);
                     //insert Measures
                     for (var i = 1, len = lines.length; i < len; i++) {
@@ -57,16 +59,17 @@ exports.importFile = function(filePath) {
                             MLC: fields[5],
                             MCC: fields[6],
                             MEC: fields[7]
-                        })
+                        });
                         
-                        console.log('Inserting measure ' + measureDoc);
+                        console.log('Inserting measure ' + i);
 
                         measureDoc.save(function (err, mDoc) {
                           if (err) return console.error(err);
                         });
                         
                     }
-                    
+                    console.log('Inserted ' + lines.length);
+                    callback(lines.length);
                 });
                 
                 
@@ -77,15 +80,15 @@ exports.importFile = function(filePath) {
     c.connect({host: 'pubftp.spp.org'});
 };
 
-exports.listFiles = function(currentDir, res) {
+exports.listFiles = function(currentDir, callback) {
     console.log('Listing files for ' + currentDir);
     var c = new Client();
     c.on('ready', function() {
-        c.list(function(err, list) {
+        c.list(currentDir, function(err, list) {
             if (err) throw err;
             console.log('File list ' + list);
-            res.fileList = list;
             c.end();
+            callback(list);
         });
       });    
     c.connect({host: 'pubftp.spp.org'});

@@ -47,16 +47,22 @@ app.get('/dayslist', function(req, res){
 });
 
 app.get('/ftplist', function(req, res){
-    console.log('Received ftp list request ' + req);
-    fileManager.listFiles(req.currentDirectory, res).then(function(param){
-        console.log('After listing ' + param);
-    });   
+    console.log('Received ftp list request ' + req.toString());
+    console.log('Cur dir' + req.query.currentDirectory);
+    fileManager.listFiles(req.query.currentDirectory, function(list){
+//        list.forEach(function (item){
+//            console.log("Name -> " + item.name);
+//            console.log("Size -> " + item.size);
+//        });
+        res.json(list);
+    });
 });
 
 app.post('/importfile', function(req, res){
     console.log('Received importfile request ' + req);
-    fileManager.importFile(req.filePath).then(function(param){
-        console.log('After listing ' + param);
+    fileManager.importFile(req.query.filePath, function(totalRows){
+        console.log('After import rows: ' + totalRows.toString());
+        res.json({ totalRows: totalRows });
     });   
 });
 
