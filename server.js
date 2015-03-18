@@ -48,8 +48,7 @@ app.post('/importfile', function(req, res){
 
 app.get('/loadedfilelist', function(req, res){
     console.log('Received loaded file list request ');
-    console.log('Cur dir' + req.query.currentDirectory);
-    dataService.listLoadedFiles(req.query.currentDirectory, function(list){
+    dataService.listLoadedFiles(function(list){
 //        list.forEach(function (item){
 //            console.log("Name -> " + item.name);
 //            console.log("Size -> " + item.size);
@@ -59,8 +58,8 @@ app.get('/loadedfilelist', function(req, res){
 });
 
 app.get('/search', function(req, res){
-    console.log('Received search request ' + req.body);
-    dataService.search(req.body, function(detail, graphData){
+    console.log('Received search request ' + req.query.toString());
+    dataService.search(req.query, function(detail, graphData){
         res.json({detail: detail, graphData: graphData});
     });
 });

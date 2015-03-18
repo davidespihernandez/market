@@ -7,9 +7,11 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="http://code.highcharts.com/stock/highstock.src.js"></script>
         <title>Market information</title>
     </head>
-    <body>
+    <body ng-controller="SearchController">
         <nav class="navbar navbar-inverse">
           <div class="container">
             <div class="navbar-header">
@@ -23,16 +25,14 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
-                <li class="active"><a href="index.html">Load</a></li>
+                <li><a href="index.html">Load</a></li>
                 <li class="active"><a href="search.html">Search</a></li>
               </ul>
             </div><!--/.nav-collapse -->
           </div>
         </nav>
         
-        <div class="container" ng-controller="SearchController">
-            <h1>Search</h1>
-            <div class="row">
+            <div class="row" style="margin: 20px">
                 <div class="col-xs-12">
                     <div class="panel panel-primary">
                         <!-- Default panel contents -->
@@ -61,19 +61,8 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="panel panel-primary">
-                        <!-- Default panel contents -->
-                        <div class="panel-heading">Graph</div>
-                        <div class="panel-body">
-                            <div id="graphContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
+            <div class="row" style="margin: 20px">
+                <div class="col-xs-6">
                     <div class="panel panel-primary">
                       <!-- Default panel contents -->
                       <div class="panel-heading">Data</div>
@@ -84,15 +73,9 @@
                       <table class="table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Market</th>
-                                <th>Type</th>
-                                <th>Year</th>
-                                <th>Month</th>
-                                <th>Interval from</th>
-                                <th>Interval to</th>
-                                <th>Settlement Location</th>
-                                <th>Pnode</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Location</th>
                                 <th>LMP</th>
                                 <th>MLC</th>
                                 <th>MCC</th>
@@ -102,15 +85,9 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="data in dataList">
-                                <td>{{data.name}}</td>
-                                <td>{{data.market}}</td>
-                                <td>{{data.marketType}}</td>
-                                <td>{{data.year}}</td>
-                                <td>{{data.month}}</td>
                                 <td>{{data.Interval}}</td>
                                 <td>{{data.GMTIntervalEnd}}</td>
                                 <td>{{data.Settlement_Location}}</td>
-                                <td>{{data.Pnode}}</td>
                                 <td>{{data.LMP}}</td>
                                 <td>{{data.MLC}}</td>
                                 <td>{{data.MCC}}</td>
@@ -121,11 +98,17 @@
                       </table>
                     </div>
                 </div>
+                <div class="col-xs-6">
+                    <div class="panel panel-primary">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Graph</div>
+                        <div class="panel-body">
+                            <highchart id="chart" config="highchartsNG"></highchart>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>        
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
         <script src="controllers/controller.js"></script>
-        <script src="http://code.highcharts.com/highcharts.js"></script>
-        <script src="http://code.highcharts.com/modules/exporting.js"></script>
     </body>
 </html>

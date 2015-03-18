@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <title>Market information</title>
     </head>
-    <body>
+    <body ng-controller="FileListController">
         <nav class="navbar navbar-inverse">
           <div class="container">
             <div class="navbar-header">
@@ -30,10 +30,8 @@
           </div>
         </nav>
         
-        <div class="container" ng-controller="FileListController">
-            <h1>Load data</h1>
-            <div class="row">
-                <div class="col-xs-6">
+            <div class="row" style="margin: 20px">
+                <div class="col-xs-5">
                     <div class="panel panel-primary">
                       <!-- Default panel contents -->
                       <div class="panel-heading">Directories</div>
@@ -48,7 +46,6 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Type</th>
                                 <th>Size</th>
                                 <th><i ng-show="showFilesLoading" class="fa fa-refresh fa-spin text-right"></i></th>
                             </tr>
@@ -61,7 +58,6 @@
                                 <td ng-if="file.type != 'd'">
                                     {{file.name}}
                                 </td>
-                                <td>{{file.type}}</td>
                                 <td>{{file.size}}</td>
                                 <td ng-if="file.type === 'd'">
                                     
@@ -74,7 +70,7 @@
                       </table>
                     </div>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-7">
                     <div class="panel panel-primary">
                       <!-- Default panel contents -->
                       <div class="panel-heading">Already loaded</div>
@@ -85,7 +81,6 @@
                       <table class="table">
                         <thead>
                             <tr>
-                                <th>Name</th>
                                 <th>Market</th>
                                 <th>Type</th>
                                 <th>Year</th>
@@ -96,7 +91,6 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="file in fileLoadedList">
-                                <td>{{file.name}}</td>
                                 <td>{{file.market}}</td>
                                 <td>{{file.marketType}}</td>
                                 <td>{{file.year}}</td>
@@ -108,9 +102,10 @@
                       </table>
                     </div>
                 </div>
-            </div>
         </div>        
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
         <script src="controllers/controller.js"></script>
+        <script src="http://code.highcharts.com/highcharts.src.js"></script>
+        <script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
     </body>
 </html>
