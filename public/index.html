@@ -30,10 +30,10 @@
           </div>
         </nav>
         
-        <div class="container">
+        <div class="container" ng-controller="FileListController">
             <h1>Load data</h1>
             <div class="row">
-                <div class="col-xs-6" ng-controller="FileListController">
+                <div class="col-xs-6">
                     <div class="panel panel-primary">
                       <!-- Default panel contents -->
                       <div class="panel-heading">Directories</div>
@@ -74,7 +74,7 @@
                       </table>
                     </div>
                 </div>
-                <div class="col-xs-6" ng-controller="LoadedListController">
+                <div class="col-xs-6">
                     <div class="panel panel-primary">
                       <!-- Default panel contents -->
                       <div class="panel-heading">Already loaded</div>
@@ -86,14 +86,22 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Rows</th>
+                                <th>Market</th>
+                                <th>Type</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>Date</th>
                                 <th><i ng-show="showFileDownloading" class="fa fa-refresh fa-spin text-right"></i></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="file in fileList">
+                            <tr ng-repeat="file in fileLoadedList">
                                 <td>{{file.name}}</td>
-                                <td>{{file.rows}}</td>
+                                <td>{{file.market}}</td>
+                                <td>{{file.marketType}}</td>
+                                <td>{{file.year}}</td>
+                                <td>{{file.month}}</td>
+                                <td>{{file.date}}</td>
                                 <td></td>
                             </tr>
                         </tbody>

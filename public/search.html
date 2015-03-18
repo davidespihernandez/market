@@ -1,0 +1,131 @@
+<!doctype html>
+<html ng-app="market">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <title>Market information</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">Market data for Bart</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html">Load</a></li>
+                <li class="active"><a href="search.html">Search</a></li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div>
+        </nav>
+        
+        <div class="container" ng-controller="SearchController">
+            <h1>Search</h1>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-primary">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Filter</div>
+                        <div class="panel-body">
+                            <form class="form-inline">
+                              <div class="form-group">
+                                <label for="dateFromInput">From</label>
+                                <input type="text" class="form-control" id="dateFromInput" ng-model="dateFromInput" placeholder="YYYY-MM-DD" />
+                              </div>
+                              <div class="form-group">
+                                <label for="dateToInput">To</label>
+                                <input type="text" class="form-control" id="dateToInput" ng-model="dateToInput" placeholder="YYYY-MM-DD" />
+                              </div>
+                              <div class="form-group">
+                                <label for="locationInput">Location</label>
+                                <input type="text" class="form-control" id="locationInput" ng-model="locationInput" placeholder="Location" />
+                              </div>
+                              <div class="form-group">
+                                <label for="nodeInput">Node</label>
+                                <input type="text" class="form-control" id="nodeInput" ng-model="nodeInput" placeholder="Node" />
+                              </div>
+                              <button class="btn btn-default" ng-click="search()">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-primary">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Graph</div>
+                        <div class="panel-body">
+                            <div id="graphContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-primary">
+                      <!-- Default panel contents -->
+                      <div class="panel-heading">Data</div>
+                      <div class="panel-body">
+                        <p>Data</p>
+                      </div>
+
+                      <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Market</th>
+                                <th>Type</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>Interval from</th>
+                                <th>Interval to</th>
+                                <th>Settlement Location</th>
+                                <th>Pnode</th>
+                                <th>LMP</th>
+                                <th>MLC</th>
+                                <th>MCC</th>
+                                <th>MEC</th>
+                                <th><i ng-show="showSearching" class="fa fa-refresh fa-spin text-right"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="data in dataList">
+                                <td>{{data.name}}</td>
+                                <td>{{data.market}}</td>
+                                <td>{{data.marketType}}</td>
+                                <td>{{data.year}}</td>
+                                <td>{{data.month}}</td>
+                                <td>{{data.Interval}}</td>
+                                <td>{{data.GMTIntervalEnd}}</td>
+                                <td>{{data.Settlement_Location}}</td>
+                                <td>{{data.Pnode}}</td>
+                                <td>{{data.LMP}}</td>
+                                <td>{{data.MLC}}</td>
+                                <td>{{data.MCC}}</td>
+                                <td>{{data.MEC}}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+        </div>        
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+        <script src="controllers/controller.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+        <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    </body>
+</html>

@@ -2,7 +2,8 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var Client = require('ftp');
-var fileManager = require('./fileManager.js');
+var fileService = require('./fileService.js');
+var dataService = require('./dataService.js');
 
 mongoose.connect('mongodb://localhost/market');
 
@@ -13,27 +14,6 @@ db.once('open', function (callback) {
     console.log('Succesfully connected to Mongo!');
 });
 
-
-//Mongo models
-var marketSchema = mongoose.Schema({
-    filePath: String
-});
-
-var Market = mongoose.model('Market', marketSchema);
-
-var measureSchema = mongoose.Schema({
-    market: {type: mongoose.Schema.Types.ObjectId, ref: 'Market'},
-    Interval: String,
-    GMTIntervalEnd: String,
-    Settlement_Location: String,
-    Pnode: String,
-    LMP: Number,
-    MLC: Number,
-    MCC: Number,
-    MEC: Number
-});
-
-var Measure = mongoose.model('Measure', measureSchema);
 
 app.use(express.static(__dirname + "/public"));
 
@@ -47,9 +27,9 @@ app.get('/dayslist', function(req, res){
 });
 
 app.get('/ftplist', function(req, res){
-    console.log('Received ftp list request ' + req.toString());
+    console.log('Received ftp list request');
     console.log('Cur dir' + req.query.currentDirectory);
-    fileManager.listFiles(req.query.currentDirectory, function(list){
+    fileService.listFiles(req.query.currentDirectory, function(list){
 //        list.forEach(function (item){
 //            console.log("Name -> " + item.name);
 //            console.log("Size -> " + item.size);
@@ -59,11 +39,30 @@ app.get('/ftplist', function(req, res){
 });
 
 app.post('/importfile', function(req, res){
-    console.log('Received importfile request ' + req);
-    fileManager.importFile(req.query.filePath, function(totalRows){
+    console.log('Received importfile request');
+    fileService.importFile(req.query.filePath, function(totalRows){
         console.log('After import rows: ' + totalRows.toString());
         res.json({ totalRows: totalRows });
     });   
+});
+
+app.get('/loadedfilelist', function(req, res){
+    console.log('Received loaded file list request ');
+    console.log('Cur dir' + req.query.currentDirectory);
+    dataService.listLoadedFiles(req.query.currentDirectory, function(list){
+//        list.forEach(function (item){
+//            console.log("Name -> " + item.name);
+//            console.log("Size -> " + item.size);
+//        });
+        res.json(list);
+    });
+});
+
+app.get('/search', function(req, res){
+    console.log('Received search request ' + req.body);
+    dataService.search(req.body, function(detail, graphData){
+        res.json({detail: detail, graphData: graphData});
+    });
 });
 
 

@@ -6,10 +6,11 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
     $scope.showFilesLoading = true;
     $scope.showFileDownloading = false;
     $http.get('/ftplist?currentDirectory=Markets').success( function(response){
-        console.log('File list ' + response.toString());
+        console.log('Initial File list ' + response.toString());
         $scope.fileList = response;
         $scope.showFilesLoading = false;
     });
+    
     $scope.listDir = function(dirName){
         console.log("Loading dir " + dirName);
         $scope.currentDirectory = $scope.currentDirectory + "/" + dirName;
@@ -32,6 +33,14 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
             $scope.showFilesLoading = false;
         });
     };
+    $scope.listLoadedFiles = function(){
+        console.log("Listing loaded files");
+        $scope.fileLoadedList = []
+        $http.get('/loadedfilelist').success( function(response){
+            console.log('Files retrieved ' + response.toString());
+            $scope.fileLoadedList = response;
+        });
+    };
     $scope.loadFile = function(fileName){
         console.log("Loading file " + fileName);
         var fullPath = $scope.currentDirectory + "/" + fileName;
@@ -39,16 +48,41 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
         $http.post('/importfile?filePath=' + fullPath).success( function(response){
             console.log('Loaded! ' + fullPath);
             $scope.showFileDownloading = false;
+            //reload files
+            $scope.listLoadedFiles();
         });
     };
-        
+    
+    //call the function to show loaded files
+    $scope.listLoadedFiles();
+    
 }]);
 
-market.controller('LoadedListController', ['$scope', '$http', function($scope, $http){
-    console.log("LoadedListController!");
-//    $http.get('/ftplist?currentDirectory=Markets').success( function(response){
-//        console.log('File list ' + response);
-//        $scope.fileList = response;
-//    });
-    $scope.fileList = [{name: 'File1', rows:10000}, {name: 'File2', rows:12000}];
+market.controller('SearchController', ['$scope', '$http', function($scope, $http){
+    console.log("SearchController!");
+    $scope.showSearching = false;
+    $scope.dateFromInput = "";
+    $scope.dateToInput = "";
+    $scope.locationInput = "";
+    $scope.nodeInput = "";
+    $scope.dataList = [];
+    $scope.graphData = null;
+
+    $scope.search = function(){
+        console.log("Searching ");
+        $scope.dataList = []
+        $scope.showSearching = true;
+         $http
+            .get('/search', {dateFrom: $scope.dateFromInput, dateTo: $scope.dateToInput, location: $scope.locationInput, node: $scope.nodeInput})
+            .success(function(response){
+                console.log('Search response ' + response.toString());
+                $scope.dataList = response.detail;
+                $scope.graphData = response.graphData;
+            })
+            .error(function(response){
+                console.log('Error searching!: ' + response);
+            });
+        
+    };
 }]);
+
