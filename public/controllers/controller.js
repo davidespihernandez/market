@@ -1,4 +1,10 @@
-var market = angular.module('market', ['chart.js','ui.bootstrap'])  
+var market = angular.module('market', ['chart.js','ui.bootstrap','ngSanitize','ngCsv'])  
+
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
 
 market.controller('FileListController', ['$scope', '$http', function($scope, $http){
     console.log("FileListController!");
@@ -63,18 +69,25 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
     $scope.showSearching = false;
     $scope.dateFromInput = "";
     $scope.dateToInput = "";
-    $scope.locationInput = "AEC";
-    $scope.nodeInput = "";
+    $scope.locationInput = "";
     $scope.dataList = [];
     $scope.graphSelectedSeries = "ALL";
-    
+    $scope.locations = [];
+    $scope.averageLMP = 0; $scope.averageMLC = 0; $scope.averageMCC = 0; $scope.averageMEC = 0; 
     $scope.labels = [" ", " "];
     
     $scope.series = ["LMP", "MLC", "MCC", "MEC"];
-    $scope.data = [
+    $scope.graphData = [
         [0, 0],
         [0, 0]
     ];
+    $scope.graphOptions = { 
+                            //datasetFill : false, 
+                            pointDotRadius : 3
+                          };
+    
+    $scope.labelsFilter = function (label,index){return false;};
+    
     $scope.onClick = function (points, evt) {
         console.log(points, evt);
     };
@@ -93,29 +106,48 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
         $scope.openedTo = true;
     };
     
+    $scope.toUTCDate = function(dateStr){
+        var date = new Date(dateStr)
+        var _utc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),  date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+        return _utc;
+    };
+    
+    $scope.toUTCDateString = function(dateStr){
+        var date = new Date(dateStr);
+        var _utc = pad((date.getUTCMonth()+1),2) + "-" + pad(date.getUTCDate(),2) + "-" + date.getUTCFullYear()  + " " + pad(date.getUTCHours(),2) + ":" + pad(date.getUTCMinutes(),2);
+        return _utc;
+    };
+    
+    
     $scope.populateGraph = function(){
         var serie = $scope.graphSelectedSeries;
         $scope.labels = [];
         var LMP = [], MLC = [], MCC = [], MEC = [];
-        $scope.data = [];
+        $scope.graphData = [];
+        var avgLMP = 0, avgMLC = 0, avgMCC = 0, avgMEC = 0;
         $scope.dataList.forEach(function(item){
-            $scope.labels.push(item.Interval);
+            avgLMP += item.LMP; avgMLC += item.MLC; avgMCC += item.MCC; avgMEC += item.MEC;
+            $scope.labels.push($scope.toUTCDateString(item.Interval));
             LMP.push(item.LMP);
             MLC.push(item.MLC);
             MCC.push(item.MCC);
             MEC.push(item.MEC);
         });
+        $scope.averageLMP = (avgLMP / $scope.dataList.length).toFixed(2); 
+        $scope.averageMLC = (avgMLC / $scope.dataList.length).toFixed(2); 
+        $scope.averageMCC = (avgMCC / $scope.dataList.length).toFixed(2); 
+        $scope.averageMEC = (avgMEC / $scope.dataList.length).toFixed(2); 
         if(serie === "ALL" || serie === "LMP"){
-            $scope.data.push(LMP);
+            $scope.graphData.push(LMP);
         }
         if(serie === "ALL" || serie === "MLC"){
-            $scope.data.push(MLC);
+            $scope.graphData.push(MLC);
         }
         if(serie === "ALL" || serie === "MCC"){
-            $scope.data.push(MCC);
+            $scope.graphData.push(MCC);
         }
         if(serie === "ALL" || serie === "MEC"){
-            $scope.data.push(MEC);
+            $scope.graphData.push(MEC);
         }
     };
 
@@ -128,7 +160,7 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
             .success(function(response){
                 //console.log('Search response ' + response.toString());
                 $scope.showSearching = false;
-                $scope.dataList = response.detail;
+                $scope.dataList = response;
                 //fill the graph data
                 $scope.populateGraph();
             })
@@ -143,6 +175,27 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
         $scope.populateGraph();
     };
     
-    $scope.search();
+    $scope.fillLocations = function(callback){
+        $http
+            .get('/locations')
+            .success(function(response){
+                //console.log('Search response ' + response.toString());
+                $scope.locations = response;
+                if($scope.locations.length>0){
+                    $scope.locationInput = $scope.locations[0]
+                    console.log('First location ' + $scope.locationInput);
+                }
+                //TODO: select the first location
+                callback();
+            })
+            .error(function(response){
+                console.log('Error searching!: ' + response);
+            });
+    };
+    
+    $scope.fillLocations(function(){
+        $scope.search();
+    });
+    
 }]);
 

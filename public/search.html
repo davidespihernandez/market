@@ -20,7 +20,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#">Market data for Bart</a>
+              <a class="navbar-brand" href="#">SPP Market Data</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
@@ -58,32 +58,29 @@
                               </div>
                               <div class="form-group">
                                 <label for="locationInput">Location</label>
-                                <input type="text" class="form-control" id="locationInput" ng-model="locationInput" placeholder="Location" />
+                                <select class="form-control" ng-init="locationInput = locations[0]" ng-model="locationInput" ng-options="location for location in locations"></select>
                               </div>
-                              <div class="form-group">
-                                <label for="nodeInput">Node</label>
-                                <input type="text" class="form-control" id="nodeInput" ng-model="nodeInput" placeholder="Node" />
-                              </div>
-                              <button class="btn btn-default" ng-click="search()">Search</button>
+                              <button class="btn btn-default" ng-click="search()"><i class="glyphicon glyphicon-search"></i> Search</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row" style="margin: 20px">
-                <div class="col-xs-6">
+                <div class="col-xs-5">
                     <div class="panel panel-primary">
                       <!-- Default panel contents -->
-                      <div class="panel-heading">Data</div>
-                      <div class="panel-body">
-                        <p>Data</p>
+                      <div class="panel-heading">
+                          Data
+                          <span class="pull-right">
+                              <button class="btn btn-primary btn-sm" type="button" ng-csv="dataList" filename="market_export.csv"> <i class="glyphicon glyphicon-download-alt"></i> Excel </button>
+                          </span>
                       </div>
 
                       <table class="table">
                         <thead>
                             <tr>
-                                <th>From</th>
-                                <th>To</th>
+                                <th>Date</th>
                                 <th>Location</th>
                                 <th>LMP</th>
                                 <th>MLC</th>
@@ -93,9 +90,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="data in dataList">
-                                <td>{{data.Interval | date:'MM-dd-yyyy HH:mm:ss Z'}}</td>
-                                <td>{{data.GMTIntervalEnd | date:'MM-dd-yyyy HH:mm:ss Z'}}</td>
+                            <tr ng-repeat="data in dataList">                                
+                                <td>{{toUTCDate(data.Interval) | date:'MM-dd-yyyy HH:mm'}}</td>
                                 <td>{{data.Settlement_Location}}</td>
                                 <td>{{data.LMP}}</td>
                                 <td>{{data.MLC}}</td>
@@ -107,12 +103,23 @@
                       </table>
                     </div>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-7">
                     <div class="panel panel-primary">
                         <!-- Default panel contents -->
-                        <div class="panel-heading">Graph</div>
+                        <div class="panel-heading">
+                            Graph
+                        </div>
                         <div class="panel-body">
-                            <div class="text-right">
+                            <span class="pull-left">
+                                <ul class="list-inline">
+                                    <li><b>Averages</b></li>
+                                    <li>LMP <span class="badge">{{averageLMP}}</span></li>
+                                    <li>MLC <span class="badge">{{averageMLC}}</span></li>
+                                    <li>MCC <span class="badge">{{averageMCC}}</span></li>
+                                    <li>MEC <span class="badge">{{averageMEC}}</span></li>
+                                </ul>
+                            </span>
+                            <span class="pull-right">
                                 <div class="btn-group" dropdown>
                                   <button type="button" class="btn btn-info dropdown-toggle" dropdown-toggle>
                                     {{graphSelectedSeries}} <span class="caret"></span>
@@ -126,10 +133,10 @@
                                     <li><a ng-click="filterSeries('MEC')">MEC</a></li>
                                   </ul>
                                 </div>
-                            </div>
+                            </span>
 
-                            <canvas id="line" class="chart chart-line" data="data"
-                              labels="labels" legend="true" series="series" height="300px"
+                            <canvas id="line" class="chart chart-line" data="graphData" options="graphOptions" 
+                              labels="labels" legend="true" series="series" height="300px" labelsFilter="labelsFilter" 
                               click="onClick">
                             </canvas> 
                         </div>
@@ -141,5 +148,7 @@
         <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
         <script src="controllers/controller.js"></script>
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-sanitize.js"></script>
+        <script src="ng-csv.min.js"></script>
     </body>
 </html>

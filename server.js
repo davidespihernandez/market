@@ -59,8 +59,15 @@ app.get('/loadedfilelist', function(req, res){
 
 app.get('/search', function(req, res){
     console.log('Received search request ' + req.query.toString());
-    dataService.search(req.query, function(detail, graphData){
-        res.json({detail: detail, graphData: graphData});
+    dataService.search(req.query, function(detail){
+        res.json(detail);
+    });
+});
+
+app.get('/locations', function(req, res){
+    console.log('Received locations request ');
+    dataService.distinctLocations(function(locations){
+        res.json(locations);
     });
 });
 

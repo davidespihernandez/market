@@ -32,6 +32,13 @@ function aggregate(parameters, callback){
         return callback(result);
     });        
 };
+
+exports.distinctLocations = function (callback){
+    console.log('Distinct locations');
+    models.Measure.distinct('Settlement_Location', function(err, locations){
+        callback(locations);
+    });        
+};
                            
 exports.search = function(parameters, callback) {
     console.log('Searching data ' + parameters.toString());
@@ -48,15 +55,11 @@ exports.search = function(parameters, callback) {
         console.log('Location ' + parameters.location);
         query = query.where('Settlement_Location').equals(parameters.location);
     }
-    if(parameters.node){
-        console.log('Node ' + parameters.node);
-        query = query.where('Pnode').equals(parameters.node);
-    }
 
     query.sort({ Interval: 'asc' }).limit(100).exec(function (err, measures) {
         if (err) return console.error(err);
         //console.log("Return data -> " + measures.toString());
-        return callback(measures, null);
+        return callback(measures);
         //now perform que aggregation query
 //        aggregate(parameters, function(aggrResults){
 //            return callback(measures, aggrResults);
