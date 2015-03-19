@@ -7,8 +7,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script src="http://code.highcharts.com/stock/highstock.src.js"></script>
+        <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
         <title>Market information</title>
     </head>
     <body ng-controller="SearchController">
@@ -85,8 +84,8 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="data in dataList">
-                                <td>{{data.Interval}}</td>
-                                <td>{{data.GMTIntervalEnd}}</td>
+                                <td>{{data.Interval | date:'MM-dd-yyyy HH:mm:ss Z'}}</td>
+                                <td>{{data.GMTIntervalEnd | date:'MM-dd-yyyy HH:mm:ss Z'}}</td>
                                 <td>{{data.Settlement_Location}}</td>
                                 <td>{{data.LMP}}</td>
                                 <td>{{data.MLC}}</td>
@@ -103,12 +102,17 @@
                         <!-- Default panel contents -->
                         <div class="panel-heading">Graph</div>
                         <div class="panel-body">
-                            <highchart id="chart" config="highchartsNG"></highchart>
+                            <canvas id="line" class="chart chart-line" data="data"
+                              labels="labels" legend="true" series="series" height="300px"
+                              click="onClick">
+                            </canvas> 
                         </div>
                     </div>
                 </div>
             </div>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+        <script src="bower_components/Chart.js/Chart.min.js"></script>
+        <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
         <script src="controllers/controller.js"></script>
     </body>
 </html>
