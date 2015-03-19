@@ -40,11 +40,21 @@
                             <form class="form-inline">
                               <div class="form-group">
                                 <label for="dateFromInput">From</label>
-                                <input type="text" class="form-control" id="dateFromInput" ng-model="dateFromInput" placeholder="YYYY-MM-DD" />
+                                <div class="input-group">
+                                    <input type="text" class="form-control" datepicker-popup="dd-MMMM-yyyy" ng-model="dateFromInput" is-open="openedFrom" ng-required="true" close-text="Close" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-click="openFrom($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
                               </div>
                               <div class="form-group">
                                 <label for="dateToInput">To</label>
-                                <input type="text" class="form-control" id="dateToInput" ng-model="dateToInput" placeholder="YYYY-MM-DD" />
+                                <div class="input-group">
+                                    <input type="text" class="form-control" datepicker-popup="dd-MMMM-yyyy" ng-model="dateToInput" is-open="openedTo" ng-required="true" close-text="Close" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-click="openTo($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
                               </div>
                               <div class="form-group">
                                 <label for="locationInput">Location</label>
@@ -102,6 +112,22 @@
                         <!-- Default panel contents -->
                         <div class="panel-heading">Graph</div>
                         <div class="panel-body">
+                            <div class="text-right">
+                                <div class="btn-group" dropdown>
+                                  <button type="button" class="btn btn-info dropdown-toggle" dropdown-toggle>
+                                    {{graphSelectedSeries}} <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li><a ng-click="filterSeries('ALL')">ALL</a></li>
+                                    <li class="divider"></li>
+                                    <li><a ng-click="filterSeries('LMP')">LMP</a></li>
+                                    <li><a ng-click="filterSeries('MLC')">MLC</a></li>
+                                    <li><a ng-click="filterSeries('MCC')">MCC</a></li>
+                                    <li><a ng-click="filterSeries('MEC')">MEC</a></li>
+                                  </ul>
+                                </div>
+                            </div>
+
                             <canvas id="line" class="chart chart-line" data="data"
                               labels="labels" legend="true" series="series" height="300px"
                               click="onClick">
@@ -114,5 +140,6 @@
         <script src="bower_components/Chart.js/Chart.min.js"></script>
         <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
         <script src="controllers/controller.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     </body>
 </html>

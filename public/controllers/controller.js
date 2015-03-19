@@ -1,4 +1,4 @@
-var market = angular.module('market', ['chart.js'])  
+var market = angular.module('market', ['chart.js','ui.bootstrap'])  
 
 market.controller('FileListController', ['$scope', '$http', function($scope, $http){
     console.log("FileListController!");
@@ -66,6 +66,7 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
     $scope.locationInput = "AEC";
     $scope.nodeInput = "";
     $scope.dataList = [];
+    $scope.graphSelectedSeries = "ALL";
     
     $scope.labels = [" ", " "];
     
@@ -76,6 +77,46 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
     ];
     $scope.onClick = function (points, evt) {
         console.log(points, evt);
+    };
+    
+    //angular bootstrap
+    $scope.openFrom = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.openedFrom = true;
+    };
+    $scope.openTo = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.openedTo = true;
+    };
+    
+    $scope.populateGraph = function(){
+        var serie = $scope.graphSelectedSeries;
+        $scope.labels = [];
+        var LMP = [], MLC = [], MCC = [], MEC = [];
+        $scope.data = [];
+        $scope.dataList.forEach(function(item){
+            $scope.labels.push(item.Interval);
+            LMP.push(item.LMP);
+            MLC.push(item.MLC);
+            MCC.push(item.MCC);
+            MEC.push(item.MEC);
+        });
+        if(serie === "ALL" || serie === "LMP"){
+            $scope.data.push(LMP);
+        }
+        if(serie === "ALL" || serie === "MLC"){
+            $scope.data.push(MLC);
+        }
+        if(serie === "ALL" || serie === "MCC"){
+            $scope.data.push(MCC);
+        }
+        if(serie === "ALL" || serie === "MEC"){
+            $scope.data.push(MEC);
+        }
     };
 
     $scope.search = function(){
@@ -89,26 +130,19 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
                 $scope.showSearching = false;
                 $scope.dataList = response.detail;
                 //fill the graph data
-                $scope.labels = [];
-                var LMP = [], MLC = [], MCC = [], MEC = [];
-                $scope.data = [];
-                $scope.dataList.forEach(function(item){
-                    $scope.labels.push(item.Interval);
-                    LMP.push(item.LMP);
-                    MLC.push(item.MLC);
-                    MCC.push(item.MCC);
-                    MEC.push(item.MEC);
-                });
-                $scope.data.push(LMP);
-                $scope.data.push(MLC);
-                $scope.data.push(MCC);
-                $scope.data.push(MEC);
+                $scope.populateGraph();
             })
             .error(function(response){
                 console.log('Error searching!: ' + response);
             });
         
     };
+    
+    $scope.filterSeries = function(serie){
+        $scope.graphSelectedSeries = serie;
+        $scope.populateGraph();
+    };
+    
     $scope.search();
 }]);
 
