@@ -12,12 +12,6 @@ function fileNameInfo (fileName){
     var name = components[5];
     var date = name.substring(name.lastIndexOf('-')+1, name.lastIndexOf('.')).substring(0,8)
     var dateDate = Date.parse(date.substring(0,4) + "-" + date.substring(4,6) + "-" + date.substring(6,8))
-    console.log("fileName -> " + fileName);
-    console.log("marketCode -> " + marketCode);
-    console.log("marketType -> " + marketType);
-    console.log("year -> " + year);
-    console.log("month -> " + month);
-    console.log("date -> " + date);
     return {
         market: marketCode,
         marketType: marketType,
@@ -30,19 +24,14 @@ function fileNameInfo (fileName){
 function getMarketFile(filePath, callback){
     models.MarketFile.findOne({filePath: filePath}, function (err, marketFileDoc) {
         if (err) return console.error(err);
-        console.log('Retrieved -> ' + marketFileDoc)
         if(marketFileDoc){
-            console.log('Found market row ' + marketFileDoc);
             //remove existing data, we are loading
             models.Measure.remove({marketFile: marketFileDoc._id}, function(err){
-                console.log('Removed existing records');
                 return callback(marketFileDoc);
             });
         } 
         else{
-            console.log('NOT Found market row');
             var fileInfo = fileNameInfo(filePath);
-            console.log('retrieved file info date ' + fileInfo.date);
             var mk = new models.MarketFile({    
                                                 filePath : filePath,
                                                 market: fileInfo.market,
@@ -66,7 +55,6 @@ exports.importFile = function(filePath, callback) {
     var fileData = "";
     var mkt = null;
     c.on('ready', function() {
-        console.log('Connected to FTP!');
         //c.get('Markets/DA/LMP_By_SETTLEMENT_LOC/2015/03/DA-LMP-SL-201503010100.csv', function(err, stream) {
         c.get(filePath, function(err, stream) {
             //ftp://pubftp.spp.org/Markets/DA/LMP_By_SETTLEMENT_LOC/2015/03/DA-LMP-SL-201503010100.csv
@@ -80,19 +68,13 @@ exports.importFile = function(filePath, callback) {
             }); 
             
             stream.on('end',function(){
-                console.log('final output lines! ' + fileContents.split("\n").length );
-                console.log('final output! ' + fileContents.length );
                 var lines = fileContents.split("\n")
                 getMarketFile(filePath, function(marketFileDoc){
-                    console.log("Got market doc " + marketFileDoc);
                     //insert Measures
                     for (var i = 1, len = lines.length; i < len; i++) {
                         var fields = lines[i].split(',')
                         if(fields.length>1){
-                            console.log('Fields: ' + fields.toString())
                             var dateFrom = fields[0].substring(6,10) + "-" + fields[0].substring(0,2) + "-" + fields[0].substring(3,5) + "T" + fields[0].substring(11)
-                            console.log('DateFrom Orig ' + fields[0]);
-                            console.log('DateFrom changed ' + dateFrom);
                             var dateTo = fields[1].substring(6,10) + "-" + fields[1].substring(0,2) + "-" + fields[1].substring(3,5) + "T" + fields[1].substring(11)
                             //TODO: add hour
                             var measureDoc = new models.Measure({
@@ -111,8 +93,6 @@ exports.importFile = function(filePath, callback) {
                                 MCC: fields[6],
                                 MEC: fields[7]
                             });
-
-                            console.log('Inserting measure ' + i);
 
                             measureDoc.save(function (err, mDoc) {
                               if (err) return console.error(err);

@@ -1662,9 +1662,8 @@
 
 				},this);
 
-                var labelsToShow = 10;
                 var labelCounter = 0;
-                var colsPerLabel = Math.round(this.xLabels.length / labelsToShow);
+                var colsPerLabel = Math.round(this.xLabels.length / 10);
                 
 				each(this.xLabels,function(label,index){
 					var xPos = this.calculateX(index) + aliasPixel(this.lineWidth),

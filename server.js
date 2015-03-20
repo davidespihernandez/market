@@ -49,16 +49,12 @@ app.post('/importfile', function(req, res){
 app.get('/loadedfilelist', function(req, res){
     console.log('Received loaded file list request ');
     dataService.listLoadedFiles(req.query, function(list){
-//        list.forEach(function (item){
-//            console.log("Name -> " + item.name);
-//            console.log("Size -> " + item.size);
-//        });
         res.json(list);
     });
 });
 
 app.get('/search', function(req, res){
-    console.log('Received search request ' + req.query.toString());
+    console.log('Received search request ');
     dataService.search(req.query, function(detail){
         res.json(detail);
     });

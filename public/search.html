@@ -41,7 +41,7 @@
                               <div class="form-group">
                                 <label for="dateFromInput">From</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" datepicker-popup="dd-MMMM-yyyy" ng-model="dateFromInput" is-open="openedFrom" ng-required="true" close-text="Close" />
+                                    <input type="text" class="form-control" datepicker-popup="dd-MMMM-yyyy" ng-model="dateFromInput" is-open="openedFrom" ng-required="false" close-text="Close" />
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" ng-click="openFrom($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                                     </span>
@@ -50,7 +50,7 @@
                               <div class="form-group">
                                 <label for="dateToInput">To</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" datepicker-popup="dd-MMMM-yyyy" ng-model="dateToInput" is-open="openedTo" ng-required="true" close-text="Close" />
+                                    <input type="text" class="form-control" datepicker-popup="dd-MMMM-yyyy" ng-model="dateToInput" is-open="openedTo" ng-required="false" close-text="Close" />
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" ng-click="openTo($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                                     </span>
@@ -88,7 +88,7 @@
                                 <th>MLC</th>
                                 <th>MCC</th>
                                 <th>MEC</th>
-                                <th><i ng-if="showSearching" class="fa fa-refresh fa-spin text-right"></i></th>
+                                <th><i ng-show="showSearching" class="fa fa-refresh fa-spin text-right"></i></th>
                             </tr>
                         </thead>
                         <tbody>

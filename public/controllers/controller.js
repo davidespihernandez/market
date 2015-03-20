@@ -17,9 +17,9 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
     $scope.totalItems = 0;
     $scope.dateFromInput = "";
     $scope.dateToInput = "";
-    $scope.fileList = []
-    $scope.fileLoadedList = []
-    $scope.pagedFileLoadedList = []
+    $scope.fileList = [];
+    $scope.fileLoadedList = [];
+    $scope.pagedFileLoadedList = [];
 
     $scope.openFrom = function($event) {
         $event.preventDefault();
@@ -35,72 +35,8 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
         $scope.openedTo = true;
     };
     
-    $scope.listDir = function(dirName){
-        console.log("Loading dir " + dirName);
-        $scope.currentDirectory = $scope.currentDirectory + "/" + dirName;
-        $scope.fileList = []
-        $scope.showFilesLoading = true;
-        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
-            console.log('Load dir ' + response.toString());
-            $scope.fileList = response;
-            $scope.showFilesLoading = false;
-        });
-    };
-    $scope.listPreviousDir = function(){
-        $scope.currentDirectory = $scope.currentDirectory.substring(0, $scope.currentDirectory.lastIndexOf("/"));
-        console.log("Previous dir " + $scope.currentDirectory);
-        $scope.fileList = []
-        $scope.showFilesLoading = true;
-        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
-            console.log('Load dir ' + response.toString());
-            $scope.fileList = response;
-            $scope.showFilesLoading = false;
-        });
-    };
-    
-    $scope.setDir = function(dirName){
-        console.log("Loading dir " + dirName);
-        $scope.currentDirectory = dirName;
-        $scope.fileList = []
-        $scope.showFilesLoading = true;
-        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
-            console.log('Set dir ' + response.toString());
-            $scope.fileList = response;
-            $scope.showFilesLoading = false;
-        });
-    };
-    
-    $scope.listLoadedFiles = function(){
-        console.log("Listing loaded files");
-        $scope.fileLoadedList = [];
-        $http.get('/loadedfilelist?dateFrom=' + $scope.dateFromInput + "&dateTo=" + $scope.dateToInput).success( function(response){
-            console.log('Files retrieved ' + response.toString());
-            $scope.fileLoadedList = response;
-            $scope.totalItems = $scope.fileLoadedList.length;
-            var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
-            $scope.pagedFileLoadedList = $scope.fileLoadedList.slice(indexFrom, indexFrom + $scope.itemsPerPage);
-        });
-    };
-    $scope.loadFile = function(fileName){
-        console.log("Loading file " + fileName);
-        var fullPath = $scope.currentDirectory + "/" + fileName;
-        $scope.showFileDownloading = true;
-        $http.post('/importfile?filePath=' + fullPath).success( function(response){
-            $scope.showFileDownloading = false;
-            //reload files
-            $scope.listLoadedFiles();
-        });
-    };
-    
-    $scope.pageChanged = function(){
-        console.log('Page changed to ' + $scope.currentPage);
-        var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
-        $scope.pagedFileLoadedList = $scope.fileLoadedList.slice(indexFrom, indexFrom + $scope.itemsPerPage)
-    };
-    
     $scope.splitCurrentDirectory = function(){
         var dirs = $scope.currentDirectory.split('/');
-        console.log(dirs.toString());
         var arrayLength = dirs.length;
         var dirComponentsList = []
         for (var i = 0; i < arrayLength; i++) {
@@ -119,6 +55,77 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
         }
         return(dirComponentsList);
     };
+    
+    $scope.listDir = function(dirName){
+        console.log("Loading dir " + dirName);
+        $scope.currentDirectory = $scope.currentDirectory + "/" + dirName;
+        $scope.currentDirectoryComponents = $scope.splitCurrentDirectory();
+        $scope.fileList = []
+        $scope.showFilesLoading = true;
+        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
+            console.log('Load dir ' + response.toString());
+            $scope.fileList = response;
+            $scope.showFilesLoading = false;
+        });
+    };
+    $scope.listPreviousDir = function(){
+        $scope.currentDirectory = $scope.currentDirectory.substring(0, $scope.currentDirectory.lastIndexOf("/"));
+        $scope.currentDirectoryComponents = $scope.splitCurrentDirectory();
+        console.log("Previous dir " + $scope.currentDirectory);
+        $scope.fileList = []
+        $scope.showFilesLoading = true;
+        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
+            console.log('Load dir ' + response.toString());
+            $scope.fileList = response;
+            $scope.showFilesLoading = false;
+        });
+    };
+    
+    $scope.setDir = function(dirName){
+        console.log("Set dir " + dirName);
+        $scope.currentDirectory = dirName;
+        $scope.currentDirectoryComponents = $scope.splitCurrentDirectory();
+        $scope.fileList = []
+        $scope.showFilesLoading = true;
+        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
+            console.log('Set dir response');
+            $scope.fileList = response;
+            $scope.showFilesLoading = false;
+        });
+    };
+    
+    $scope.listLoadedFiles = function(){
+        console.log("Listing loaded files");
+        $scope.fileLoadedList = [];
+        $scope.pagedFileLoadedList = [];
+        $http.get('/loadedfilelist?dateFrom=' + $scope.dateFromInput + "&dateTo=" + $scope.dateToInput).success( function(response){
+            console.log('Files retrieved ');
+            $scope.fileLoadedList = response;
+            $scope.totalItems = $scope.fileLoadedList.length;
+            console.log('Total files ' + $scope.totalItems);
+            var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
+            $scope.pagedFileLoadedList = $scope.fileLoadedList.slice(indexFrom, indexFrom + $scope.itemsPerPage);
+        });
+    };
+    
+    $scope.loadFile = function(fileName){
+        console.log("Loading file " + fileName);
+        var fullPath = $scope.currentDirectory + "/" + fileName;
+        $scope.showFileDownloading = true;
+        $http.post('/importfile?filePath=' + fullPath).success( function(response){
+            $scope.showFileDownloading = false;
+            //reload files
+            $scope.listLoadedFiles();
+        });
+    };
+    
+    $scope.pageChanged = function(){
+        console.log('Page changed to ' + $scope.currentPage);
+        var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
+        $scope.pagedFileLoadedList = $scope.fileLoadedList.slice(indexFrom, indexFrom + $scope.itemsPerPage)
+    };
+    
+    $scope.currentDirectoryComponents = $scope.splitCurrentDirectory();
     
     //call the function to show loaded files
     $scope.listLoadedFiles();

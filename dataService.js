@@ -3,17 +3,18 @@ var models = require('./models');
 exports.listLoadedFiles = function(parameters, callback) {
     console.log('Listing loaded files ');
     var query = models.MarketFile.find();
-    if(parameters.dateFrom && parameters.dateFrom != "undefined"){
+    if(parameters.dateFrom && parameters.dateFrom != "undefined" && parameters.dateFrom != "null"){
         console.log('Date from ' + parameters.dateFrom);
         query = query.where('date').gte(parameters.dateFrom);
     }
-    if(parameters.dateTo && parameters.dateTo != "undefined"){
+    if(parameters.dateTo && parameters.dateTo != "undefined" && parameters.dateTo != "null"){
         console.log('Date to ' + parameters.dateTo);
         query = query.where('date').lte(parameters.dateTo);
     }
-    
+    console.log('performing query');
     query.sort({ date: 'asc' }).exec(function (err, marketFiles) {
         if (err) return console.error(err);
+        console.log("Returning marketfiles");
         return callback(marketFiles);
     });
 };
@@ -53,15 +54,15 @@ exports.distinctLocations = function (callback){
 exports.search = function(parameters, callback) {
     console.log('Searching data ' + parameters.toString());
     var query = models.Measure.find();
-    if(parameters.dateFrom && parameters.dateFrom != "undefined"){
+    if(parameters.dateFrom && parameters.dateFrom != "undefined" && parameters.dateFrom != "null"){
         console.log('Date from ' + parameters.dateFrom);
         query = query.where('date').gte(parameters.dateFrom);
     }
-    if(parameters.dateTo && parameters.dateTo != "undefined"){
+    if(parameters.dateTo && parameters.dateTo != "undefined" && parameters.dateTo != "null"){
         console.log('Date to ' + parameters.dateTo);
         query = query.where('date').lte(parameters.dateTo);
     }
-    if(parameters.location && parameters.location != "undefined"){
+    if(parameters.location && parameters.location != "undefined" && parameters.location != "null"){
         console.log('Location ' + parameters.location);
         query = query.where('Settlement_Location').equals(parameters.location);
     }
