@@ -48,7 +48,7 @@ app.post('/importfile', function(req, res){
 
 app.get('/loadedfilelist', function(req, res){
     console.log('Received loaded file list request ');
-    dataService.listLoadedFiles(function(list){
+    dataService.listLoadedFiles(req.query, function(list){
 //        list.forEach(function (item){
 //            console.log("Name -> " + item.name);
 //            console.log("Size -> " + item.size);

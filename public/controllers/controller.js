@@ -8,14 +8,32 @@ function pad(n, width, z) {
 
 market.controller('FileListController', ['$scope', '$http', function($scope, $http){
     console.log("FileListController!");
-    $scope.currentDirectory = 'Markets/DA/LMP_By_SETTLEMENT_LOC/2015/03'; //default dir
-    $scope.showFilesLoading = true;
+    $scope.currentDirectory = 'Markets/DA/LMP_By_SETTLEMENT_LOC'; //default dir
     $scope.showFileDownloading = false;
-    $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
-        console.log('Initial File list ' + response.toString());
-        $scope.fileList = response;
-        $scope.showFilesLoading = false;
-    });
+    $scope.showFilesLoading = false;
+    
+    $scope.currentPage = 1;
+    $scope.itemsPerPage = 15;
+    $scope.totalItems = 0;
+    $scope.dateFromInput = "";
+    $scope.dateToInput = "";
+    $scope.fileList = []
+    $scope.fileLoadedList = []
+    $scope.pagedFileLoadedList = []
+
+    $scope.openFrom = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.openedFrom = true;
+    };
+    
+    $scope.openTo = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.openedTo = true;
+    };
     
     $scope.listDir = function(dirName){
         console.log("Loading dir " + dirName);
@@ -39,12 +57,28 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
             $scope.showFilesLoading = false;
         });
     };
+    
+    $scope.setDir = function(dirName){
+        console.log("Loading dir " + dirName);
+        $scope.currentDirectory = dirName;
+        $scope.fileList = []
+        $scope.showFilesLoading = true;
+        $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
+            console.log('Set dir ' + response.toString());
+            $scope.fileList = response;
+            $scope.showFilesLoading = false;
+        });
+    };
+    
     $scope.listLoadedFiles = function(){
         console.log("Listing loaded files");
-        $scope.fileLoadedList = []
-        $http.get('/loadedfilelist').success( function(response){
+        $scope.fileLoadedList = [];
+        $http.get('/loadedfilelist?dateFrom=' + $scope.dateFromInput + "&dateTo=" + $scope.dateToInput).success( function(response){
             console.log('Files retrieved ' + response.toString());
             $scope.fileLoadedList = response;
+            $scope.totalItems = $scope.fileLoadedList.length;
+            var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
+            $scope.pagedFileLoadedList = $scope.fileLoadedList.slice(indexFrom, indexFrom + $scope.itemsPerPage);
         });
     };
     $scope.loadFile = function(fileName){
@@ -52,17 +86,53 @@ market.controller('FileListController', ['$scope', '$http', function($scope, $ht
         var fullPath = $scope.currentDirectory + "/" + fileName;
         $scope.showFileDownloading = true;
         $http.post('/importfile?filePath=' + fullPath).success( function(response){
-            console.log('Loaded! ' + fullPath);
             $scope.showFileDownloading = false;
             //reload files
             $scope.listLoadedFiles();
         });
     };
     
+    $scope.pageChanged = function(){
+        console.log('Page changed to ' + $scope.currentPage);
+        var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
+        $scope.pagedFileLoadedList = $scope.fileLoadedList.slice(indexFrom, indexFrom + $scope.itemsPerPage)
+    };
+    
+    $scope.splitCurrentDirectory = function(){
+        var dirs = $scope.currentDirectory.split('/');
+        console.log(dirs.toString());
+        var arrayLength = dirs.length;
+        var dirComponentsList = []
+        for (var i = 0; i < arrayLength; i++) {
+            var subDirFullString = ""
+            for(var j = 0; j<=i; j++){
+                if(subDirFullString != ""){
+                    subDirFullString += "/";
+                }
+                subDirFullString += dirs[j];
+            }
+            var dirComponent = {
+                subDirFullString: subDirFullString,
+                subDirString: dirs[i]
+            };
+            dirComponentsList.push(dirComponent);
+        }
+        return(dirComponentsList);
+    };
+    
     //call the function to show loaded files
     $scope.listLoadedFiles();
-    
+    //list current dir files
+    $scope.showFilesLoading = true;
+    $http.get('/ftplist?currentDirectory=' + $scope.currentDirectory).success( function(response){
+        $scope.fileList = response;
+        $scope.showFilesLoading = false;
+    });
 }]);
+
+////////////////////////////////
+//   CONTROLLER FOR SEARCH PAGE
+////////////////////////////////
 
 market.controller('SearchController', ['$scope', '$http', function($scope, $http){
     console.log("SearchController!");
@@ -71,6 +141,7 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
     $scope.dateToInput = "";
     $scope.locationInput = "";
     $scope.dataList = [];
+    $scope.pageDataList = []
     $scope.graphSelectedSeries = "ALL";
     $scope.locations = [];
     $scope.averageLMP = 0; $scope.averageMLC = 0; $scope.averageMCC = 0; $scope.averageMEC = 0; 
@@ -85,6 +156,10 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
                             //datasetFill : false, 
                             pointDotRadius : 3
                           };
+    
+    $scope.currentPage = 1;
+    $scope.itemsPerPage = 24;
+    $scope.totalItems = 0;
     
     $scope.labelsFilter = function (label,index){return false;};
     
@@ -156,11 +231,15 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
         $scope.dataList = []
         $scope.showSearching = true;
          $http
-            .get('/search?dateFrom=' + $scope.dateFromInput + "&dateTo=" + $scope.dateToInput + "&location=" + $scope.locationInput + "&node=" + $scope.nodeInput)
+            .get('/search?dateFrom=' + $scope.dateFromInput + "&dateTo=" + $scope.dateToInput + "&location=" + $scope.locationInput)
             .success(function(response){
                 //console.log('Search response ' + response.toString());
                 $scope.showSearching = false;
                 $scope.dataList = response;
+                $scope.totalItems = $scope.dataList.length;
+                
+                var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
+                $scope.pageDataList = $scope.dataList.slice(indexFrom, indexFrom + $scope.itemsPerPage);
                 //fill the graph data
                 $scope.populateGraph();
             })
@@ -192,6 +271,26 @@ market.controller('SearchController', ['$scope', '$http', function($scope, $http
                 console.log('Error searching!: ' + response);
             });
     };
+    
+    $scope.exportData = function(){
+        var finalData = [ ['Interval', 'Settlement_Location', 'Pnode', 'LMP', 'MLC', 'MCC', 'MEC'] ];
+        $scope.dataList.forEach(function(item){
+            finalData.push( [$scope.toUTCDateString(item.Interval), item.Settlement_Location, item.Pnode, item.LMP, item.MLC, item.MCC, item.MEC] )
+        });
+        return(finalData);
+    };
+    
+    $scope.pageChanged = function(){
+        console.log('Page changed to ' + $scope.currentPage);
+        var indexFrom = ($scope.currentPage-1)*$scope.itemsPerPage;
+        $scope.pageDataList = $scope.dataList.slice(indexFrom, indexFrom + $scope.itemsPerPage)
+
+    };
+    
+    $scope.$on('create', function (event, chart) {
+        console.log('chart created!');
+        console.log(chart);
+    });    
     
     $scope.fillLocations(function(){
         $scope.search();

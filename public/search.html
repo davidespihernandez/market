@@ -72,11 +72,13 @@
                       <!-- Default panel contents -->
                       <div class="panel-heading">
                           Data
+                      </div>
+                      <div class="panel-body">
                           <span class="pull-right">
-                              <button class="btn btn-primary btn-sm" type="button" ng-csv="dataList" filename="market_export.csv"> <i class="glyphicon glyphicon-download-alt"></i> Excel </button>
+                              <button class="btn btn-primary btn-sm" type="button" ng-csv="exportData()" filename="market_export.csv"> <i class="glyphicon glyphicon-download-alt"></i> Excel ({{totalItems}} rows) </button>
                           </span>
                       </div>
-
+                        
                       <table class="table">
                         <thead>
                             <tr>
@@ -86,11 +88,11 @@
                                 <th>MLC</th>
                                 <th>MCC</th>
                                 <th>MEC</th>
-                                <th><i ng-show="showSearching" class="fa fa-refresh fa-spin text-right"></i></th>
+                                <th><i ng-if="showSearching" class="fa fa-refresh fa-spin text-right"></i></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="data in dataList">                                
+                            <tr ng-repeat="data in pageDataList">                                
                                 <td>{{toUTCDate(data.Interval) | date:'MM-dd-yyyy HH:mm'}}</td>
                                 <td>{{data.Settlement_Location}}</td>
                                 <td>{{data.LMP}}</td>
@@ -101,6 +103,7 @@
                             </tr>
                         </tbody>
                       </table>
+                      <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" class="pagination-sm" boundary-links="true" rotate="false" ng-change="pageChanged()"></pagination>
                     </div>
                 </div>
                 <div class="col-xs-7">
