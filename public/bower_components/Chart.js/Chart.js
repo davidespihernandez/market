@@ -1662,6 +1662,10 @@
 
 				},this);
 
+                var labelsToShow = 10;
+                var labelCounter = 0;
+                var colsPerLabel = Math.round(this.xLabels.length / labelsToShow);
+                
 				each(this.xLabels,function(label,index){
 					var xPos = this.calculateX(index) + aliasPixel(this.lineWidth),
 						// Check to see if line/bar here and decide where to place the line
@@ -1713,7 +1717,14 @@
 					ctx.font = this.font;
 					ctx.textAlign = (isRotated) ? "right" : "center";
 					ctx.textBaseline = (isRotated) ? "middle" : "top";
-					ctx.fillText(label, 0, 0);
+                    //DAVID
+                    if(labelCounter === 0){
+					   ctx.fillText(label, 0, 0);
+                    }
+                    labelCounter++;
+                    if(labelCounter === colsPerLabel){
+                        labelCounter = 0;
+                    }
 					ctx.restore();
 				},this);
 
