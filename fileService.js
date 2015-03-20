@@ -130,7 +130,13 @@ exports.importFile = function(filePath, callback) {
             
         });
     });
-    c.connect({host: 'pubftp.spp.org'});
+    
+    try{
+        c.connect({host: 'pubftp.spp.org'});
+    }
+    catch(err){
+        console.error('Error connecting to FTP');
+    }
 };
 
 exports.listFiles = function(currentDir, callback) {
@@ -144,7 +150,13 @@ exports.listFiles = function(currentDir, callback) {
             return callback(list);
         });
       });    
-    c.connect({host: 'pubftp.spp.org'});
+    
+    try{
+        c.connect({host: 'pubftp.spp.org'});
+    }
+    catch(err){
+        console.error('Error connecting to FTP');
+    }
 };
 
 
