@@ -1663,7 +1663,7 @@
 				},this);
 
                 var labelCounter = 0;
-                var colsPerLabel = Math.round(this.xLabels.length / 10);
+                var colsPerLabel = Math.round(this.xLabels.length / 24);
                 
 				each(this.xLabels,function(label,index){
 					var xPos = this.calculateX(index) + aliasPixel(this.lineWidth),
@@ -1721,7 +1721,7 @@
 					   ctx.fillText(label, 0, 0);
                     }
                     labelCounter++;
-                    if(labelCounter === colsPerLabel){
+                    if(labelCounter >= colsPerLabel){
                         labelCounter = 0;
                     }
 					ctx.restore();
